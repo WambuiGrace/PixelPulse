@@ -8,9 +8,26 @@ const SavedPostsPage = () => {
 
   useEffect(() => {
     const fetchSavedPosts = async () => {
+      const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+      
+      if (!userInfo) {
+        setError('Please login to view saved posts');
+        setLoading(false);
+        return;
+      }
+
       try {
-        // Assuming the user is authenticated and the token is sent with the request
-        const res = await fetch('/api/users/saved');
+        const res = await fetch('http://localhost:5000/api/users/saved', {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${userInfo.token}`,
+          },
+        });
+        
+        if (!res.ok) {
+          throw new Error('Failed to fetch saved posts');
+        }
+        
         const data = await res.json();
         setSavedPosts(data);
       } catch (err) {
@@ -22,6 +39,13 @@ const SavedPostsPage = () => {
 
     fetchSavedPosts();
   }, []);
+
+  const handleSaveToggle = (postId, isSaved) => {
+    if (!isSaved) {
+      // Remove post from saved posts if it was unsaved
+      setSavedPosts(savedPosts.filter(post => post._id !== postId));
+    }
+  };
 
   if (loading) {
     return <span className="loading loading-spinner loading-lg"></span>;
@@ -37,7 +61,7 @@ const SavedPostsPage = () => {
       {savedPosts.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {savedPosts.map((post) => (
-            <BlogPost key={post._id} post={post} />
+            <BlogPost key={post._id} post={post} onSaveToggle={handleSaveToggle} />
           ))}
         </div>
       ) : (

@@ -16,12 +16,13 @@ const getPostById = async (req, res) => {
 };
 
 const createPost = async (req, res) => {
-  const { title, content, image } = req.body;
+  const { title, content, image, summary } = req.body;
 
   const post = new Post({
     title,
     content,
     image,
+    summary: summary || content.substring(0, 150) + '...', // Auto-generate summary if not provided
     user: req.user._id,
   });
 
@@ -30,13 +31,14 @@ const createPost = async (req, res) => {
 };
 
 const updatePost = async (req, res) => {
-  const { title, content } = req.body;
+  const { title, content, summary } = req.body;
 
   const post = await Post.findById(req.params.id);
 
   if (post) {
     post.title = title;
     post.content = content;
+    post.summary = summary || content.substring(0, 150) + '...'; // Auto-generate summary if not provided
 
     const updatedPost = await post.save();
     res.json(updatedPost);

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 const SinglePost = () => {
   const { id } = useParams();
@@ -7,13 +8,30 @@ const SinglePost = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [comment, setComment] = useState('');
+  const [isSaved, setIsSaved] = useState(false);
+  const [saveLoading, setSaveLoading] = useState(false);
   const userInfo = JSON.parse(localStorage.getItem('userInfo'));
 
   const fetchPost = async () => {
     try {
-      const res = await fetch(`/api/posts/${id}`);
+      const res = await fetch(`http://localhost:5000/api/posts/${id}`);
       const data = await res.json();
       setPost(data);
+      
+      // Check if post is saved by current user
+      if (userInfo) {
+        const savedRes = await fetch('http://localhost:5000/api/users/saved', {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${userInfo.token}`,
+          },
+        });
+        
+        if (savedRes.ok) {
+          const savedPosts = await savedRes.json();
+          setIsSaved(savedPosts.some(savedPost => savedPost._id === id));
+        }
+      }
     } catch (err) {
       setError('Failed to fetch post');
     } finally {
@@ -27,7 +45,7 @@ const SinglePost = () => {
 
   const likeHandler = async () => {
     try {
-      const res = await fetch(`/api/posts/${id}/like`, {
+      const res = await fetch(`http://localhost:5000/api/posts/${id}/like`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -43,8 +61,9 @@ const SinglePost = () => {
   };
 
   const saveHandler = async () => {
+    setSaveLoading(true);
     try {
-      const res = await fetch(`/api/posts/${id}/save`, {
+      const res = await fetch(`http://localhost:5000/api/posts/${id}/save`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -52,17 +71,25 @@ const SinglePost = () => {
         },
       });
       if (res.ok) {
-        fetchPost();
+        setIsSaved(!isSaved);
+        if (isSaved) {
+          toast.error('Post removed from saved posts');
+        } else {
+          toast.success('Post saved successfully!');
+        }
       }
     } catch (err) {
       console.error(err);
+      toast.error('Failed to save post. Please try again.');
+    } finally {
+      setSaveLoading(false);
     }
   };
 
   const commentHandler = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch(`/api/posts/${id}/comment`, {
+      const res = await fetch(`http://localhost:5000/api/posts/${id}/comment`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -116,8 +143,12 @@ const SinglePost = () => {
               <button className="btn btn-primary" onClick={likeHandler}>
                 Like ({likes.length})
               </button>
-              <button className="btn btn-secondary" onClick={saveHandler}>
-                Save
+              <button 
+                className={`btn ${isSaved ? 'btn-success' : 'btn-secondary'} ${saveLoading ? 'loading' : ''}`}
+                onClick={saveHandler}
+                disabled={saveLoading}
+              >
+                {saveLoading ? 'Saving...' : isSaved ? 'Saved' : 'Save'}
               </button>
             </div>
           )}
