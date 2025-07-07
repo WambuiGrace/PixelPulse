@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 const BlogPost = ({ post }) => {
   const {
     image,
@@ -6,29 +8,34 @@ const BlogPost = ({ post }) => {
     author,
     timestamp,
     categories,
+    _id,
   } = post;
 
   return (
-    <div className="blog-post">
-      <img src={image} alt={title} className="blog-post-image" />
-      <div className="blog-post-content">
-        <h2 className="blog-post-title">{title}</h2>
-        <p className="blog-post-summary">{summary}</p>
-        <div className="blog-post-meta">
-          <span>By {author}</span>
-          <span>{new Date(timestamp).toLocaleDateString()}</span>
+    <div className="card bg-base-100 shadow-xl">
+      <figure>
+        <img src={image} alt={title} />
+      </figure>
+      <div className="card-body">
+        <h2 className="card-title">{title}</h2>
+        <p>{summary}</p>
+        <div className="card-actions justify-end">
+          <div className="badge badge-outline">{author.name}</div>
+          <div className="badge badge-outline">
+            {new Date(timestamp).toLocaleDateString()}
+          </div>
         </div>
-        <div className="blog-post-actions">
-          <button>👍 Like</button>
-          <button>💬 Comment</button>
-          <button>🔖 Save</button>
-        </div>
-        <div className="blog-post-categories">
+        <div className="card-actions justify-end">
           {categories.map((category) => (
-            <span key={category} className="category-tag">
+            <div key={category} className="badge badge-primary">
               {category}
-            </span>
+            </div>
           ))}
+        </div>
+        <div className="card-actions justify-end">
+          <Link to={`/posts/${_id}`} className="btn btn-primary">
+            Read More
+          </Link>
         </div>
       </div>
     </div>
