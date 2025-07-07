@@ -1,17 +1,16 @@
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 
 const CreatePost = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [image, setImage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [message, setMessage] = useState({ type: '', text: '' });
   const userInfo = JSON.parse(localStorage.getItem('userInfo'));
 
   const createPostHandler = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setMessage({ type: '', text: '' });
     
     try {
       const res = await fetch('/api/posts', {
@@ -27,16 +26,23 @@ const CreatePost = () => {
         setTitle('');
         setContent('');
         setImage('');
-        setMessage({ type: 'success', text: 'Post created successfully! 🎉' });
-        // Scroll to top to show success message
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        toast.success('Post created successfully! 🎉', {
+          duration: 4000,
+          position: 'top-center',
+        });
       } else {
         const errorData = await res.json();
-        setMessage({ type: 'error', text: errorData.message || 'Failed to create post' });
+        toast.error(errorData.message || 'Failed to create post', {
+          duration: 4000,
+          position: 'top-center',
+        });
       }
     } catch (err) {
       console.error(err);
-      setMessage({ type: 'error', text: 'Something went wrong. Please try again.' });
+      toast.error('Something went wrong. Please try again.', {
+        duration: 4000,
+        position: 'top-center',
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -44,25 +50,6 @@ const CreatePost = () => {
 
   return (
     <div className="max-w-4xl mx-auto">
-      {message.text && (
-        <div className={`alert mb-6 ${message.type === 'success' ? 'alert-success' : 'alert-error'}`}>
-          <svg className="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            {message.type === 'success' ? (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            ) : (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            )}
-          </svg>
-          <span>{message.text}</span>
-          <button 
-            className="btn btn-sm btn-ghost"
-            onClick={() => setMessage({ type: '', text: '' })}
-          >
-            ✕
-          </button>
-        </div>
-      )}
-      
       <div className="card bg-base-100 shadow-xl">
         <div className="card-body p-8">
           <div className="text-center mb-8">

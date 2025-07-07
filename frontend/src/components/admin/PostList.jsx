@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 const PostList = () => {
   const [posts, setPosts] = useState([]);
@@ -37,31 +38,81 @@ const PostList = () => {
   }, [userInfo.token]);
 
   const deleteHandler = async (id, title) => {
-    if (window.confirm(`Are you sure you want to delete "${title}"? This action cannot be undone.`)) {
-      setDeleteLoading(id);
-      setMessage({ type: '', text: '' });
+    // Create a custom toast with confirmation buttons
+    toast.custom((t) => (
+      <div className="bg-base-100 border border-base-300 rounded-lg shadow-xl p-4 max-w-md">
+        <div className="flex items-start gap-3">
+          <div className="flex-shrink-0">
+            <svg className="w-6 h-6 text-warning" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.1c-.77-.833-1.732-.833-2.502 0L4.732 15.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+          </div>
+          <div className="flex-1">
+            <h3 className="font-semibold text-base-content mb-1">
+              Delete Post
+            </h3>
+            <p className="text-sm text-base-content/70 mb-4">
+              Are you sure you want to delete <span className="font-medium">"{title}"</span>? This action cannot be undone.
+            </p>
+            <div className="flex gap-2 justify-end">
+              <button
+                className="btn btn-sm btn-ghost"
+                onClick={() => toast.dismiss(t.id)}
+              >
+                Cancel
+              </button>
+              <button
+                className="btn btn-sm btn-error gap-1"
+                onClick={() => {
+                  toast.dismiss(t.id);
+                  confirmDelete(id, title);
+                }}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    ), {
+      duration: Infinity,
+      position: 'top-center',
+    });
+  };
+
+  const confirmDelete = async (id, title) => {
+    setDeleteLoading(id);
+    setMessage({ type: '', text: '' });
+    
+    try {
+      const res = await fetch(`/api/posts/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${userInfo.token}`,
+        },
+      });
       
-      try {
-        const res = await fetch(`/api/posts/${id}`, {
-          method: 'DELETE',
-          headers: {
-            Authorization: `Bearer ${userInfo.token}`,
-          },
+      if (res.ok) {
+        setPosts(posts.filter(post => post._id !== id));
+        toast.success(`"${title}" deleted successfully! 🗑️`, {
+          duration: 4000,
+          position: 'top-center',
         });
-        
-        if (res.ok) {
-          setPosts(posts.filter(post => post._id !== id));
-          setMessage({ type: 'success', text: 'Post deleted successfully! 🗑️' });
-        } else {
-          const errorData = await res.json();
-          throw new Error(errorData.message || 'Failed to delete post');
-        }
-      } catch (err) {
-        console.error('Delete error:', err);
-        setMessage({ type: 'error', text: err.message || 'Something went wrong. Please try again.' });
-      } finally {
-        setDeleteLoading(null);
+      } else {
+        const errorData = await res.json();
+        throw new Error(errorData.message || 'Failed to delete post');
       }
+    } catch (err) {
+      console.error('Delete error:', err);
+      toast.error(err.message || 'Something went wrong. Please try again.', {
+        duration: 4000,
+        position: 'top-center',
+      });
+    } finally {
+      setDeleteLoading(null);
     }
   };
 

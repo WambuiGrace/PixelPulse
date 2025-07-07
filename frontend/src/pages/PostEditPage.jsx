@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 const PostEditPage = () => {
   const { id } = useParams();
@@ -11,7 +12,6 @@ const PostEditPage = () => {
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
-  const [message, setMessage] = useState({ type: '', text: '' });
   const userInfo = JSON.parse(localStorage.getItem('userInfo'));
 
   useEffect(() => {
@@ -36,7 +36,6 @@ const PostEditPage = () => {
   const submitHandler = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setMessage({ type: '', text: '' });
     
     try {
       const res = await fetch(`/api/posts/${id}`, {
@@ -49,17 +48,26 @@ const PostEditPage = () => {
       });
       
       if (res.ok) {
-        setMessage({ type: 'success', text: 'Post updated successfully! 🎉' });
+        toast.success('Post updated successfully! 🎉', {
+          duration: 4000,
+          position: 'top-center',
+        });
         setTimeout(() => {
           navigate('/admin/dashboard/posts');
         }, 1500);
       } else {
         const errorData = await res.json();
-        setMessage({ type: 'error', text: errorData.message || 'Failed to update post' });
+        toast.error(errorData.message || 'Failed to update post', {
+          duration: 4000,
+          position: 'top-center',
+        });
       }
     } catch (err) {
       console.error(err);
-      setMessage({ type: 'error', text: 'Something went wrong. Please try again.' });
+      toast.error('Something went wrong. Please try again.', {
+        duration: 4000,
+        position: 'top-center',
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -105,25 +113,6 @@ const PostEditPage = () => {
           Back to Posts
         </Link>
       </div>
-      
-      {message.text && (
-        <div className={`alert mb-6 ${message.type === 'success' ? 'alert-success' : 'alert-error'}`}>
-          <svg className="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            {message.type === 'success' ? (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            ) : (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            )}
-          </svg>
-          <span>{message.text}</span>
-          <button 
-            className="btn btn-sm btn-ghost"
-            onClick={() => setMessage({ type: '', text: '' })}
-          >
-            ✕
-          </button>
-        </div>
-      )}
       
       <div className="card bg-base-100 shadow-xl">
         <div className="card-body p-8">
