@@ -224,36 +224,6 @@ const AuthPage = () => {
             </div>
           </div>
         </div>
-
-        {/* Features */}
-        <div className="mt-8 text-center">
-          <div className="grid grid-cols-3 gap-4 text-sm text-base-content/60">
-            <div className="flex flex-col items-center gap-2">
-              <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
-                <svg className="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-              </div>
-              <span>Secure</span>
-            </div>
-            <div className="flex flex-col items-center gap-2">
-              <div className="w-8 h-8 bg-secondary/20 rounded-full flex items-center justify-center">
-                <svg className="w-4 h-4 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <span>Fast</span>
-            </div>
-            <div className="flex flex-col items-center gap-2">
-              <div className="w-8 h-8 bg-accent/20 rounded-full flex items-center justify-center">
-                <svg className="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                </svg>
-              </div>
-              <span>Loved</span>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );
