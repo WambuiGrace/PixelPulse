@@ -1,3 +1,7 @@
+# Dependencies
+node_modules/
+*/node_modules/
+
 # Logs
 logs
 *.log
@@ -7,9 +11,10 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules/
+# Build outputs
 dist
 dist-ssr
+build
 *.local
 
 # Environment variables
@@ -54,7 +59,6 @@ out
 
 # Nuxt.js build / generate output
 .nuxt
-dist
 
 # Gatsby files
 .cache/
@@ -93,3 +97,12 @@ Thumbs.db
 # TypeScript
 *.tsbuildinfo
 
+# Backend specific
+backend/node_modules/
+backend/dist/
+backend/.env
+
+# Frontend specific
+frontend/node_modules/
+frontend/dist/
+frontend/build/
