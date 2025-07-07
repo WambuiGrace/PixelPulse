@@ -11,38 +11,39 @@ const Header = () => {
 
   return (
     <div className="navbar bg-base-100">
-      <div className="flex-1">
-        <Link to="/" className="btn btn-ghost normal-case text-xl">
-          PixelPulse
-        </Link>
-      </div>
-      <div className="flex-none">
-        <ul className="menu menu-horizontal px-1">
-          <li>
-            <Link to="/">Home</Link>
-          </li>
-          {userInfo ? (
-            <>
-              <li>
-                <Link to="/saved-posts">Saved Posts</Link>
-              </li>
-              {userInfo.isAdmin && (
-                <li>
-                  <Link to="/admin/dashboard">Dashboard</Link>
-                </li>
-              )}
-              <li>
-                <button onClick={logoutHandler}>Logout</button>
-              </li>
-            </>
-          ) : (
+        <div className="flex-1">
+          <Link to="/" className="btn btn-ghost normal-case text-xl">
+            PixelPulse
+          </Link>
+        </div>
+        <div className="flex-none">
+          <ul className="menu menu-horizontal px-1">
             <li>
-              <Link to="/auth" className="btn btn-primary btn-sm">
-                Login/Signup
-              </Link>
+              <Link to="/">Home</Link>
             </li>
-          )}
-        </ul>
+            {userInfo ? (
+              <>
+                <li>
+                  <Link to="/saved-posts">Saved Posts</Link>
+                </li>
+                {userInfo.isAdmin && (
+                  <li>
+                    <Link to="/admin/dashboard">Dashboard</Link>
+                  </li>
+                )}
+                <li>
+                  <button onClick={logoutHandler}>Logout</button>
+                </li>
+              </>
+            ) : (
+              <li>
+                <Link to="/auth" className="btn btn-primary btn-sm">
+                  Login/Signup
+                </Link>
+              </li>
+            )}
+          </ul>
+        </div>
       </div>
     </div>
   );

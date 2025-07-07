@@ -85,7 +85,7 @@ const Blog = () => {
 
   if (error) {
     return (
-      <div className="container mx-auto p-4 py-8">
+      <div className="max-w-7xl mx-auto p-4 py-8">
         <div className="alert alert-error">
           <svg className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -97,7 +97,7 @@ const Blog = () => {
   }
 
   return (
-    <div className="container mx-auto p-4 py-8">
+    <div className="max-w-7xl mx-auto p-4 py-8">
       {/* Header */}
       <div className="text-center mb-12">
         <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-4">
@@ -109,7 +109,7 @@ const Blog = () => {
       </div>
 
       {/* Search and Filter Section */}
-      <div className="bg-base-200 rounded-lg p-6 mb-8">
+      <div className="bg-base-200 rounded-lg p-6 mb-8 max-w-5xl mx-auto">
         {/* Search Bar */}
         <form onSubmit={handleSearch} className="mb-6">
           <div className="flex flex-col sm:flex-row gap-4">
@@ -211,7 +211,7 @@ const Blog = () => {
       {!loading && (
         <>
           {posts.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 max-w-6xl mx-auto">
               {posts.map((post) => (
                 <BlogPost key={post._id} post={post} />
               ))}
