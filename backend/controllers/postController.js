@@ -48,13 +48,17 @@ const updatePost = async (req, res) => {
 };
 
 const deletePost = async (req, res) => {
-  const post = await Post.findById(req.params.id);
+  try {
+    const post = await Post.findById(req.params.id);
 
-  if (post) {
-    await post.remove();
-    res.json({ message: 'Post removed' });
-  } else {
-    res.status(404).json({ message: 'Post not found' });
+    if (post) {
+      await Post.findByIdAndDelete(req.params.id);
+      res.json({ message: 'Post removed' });
+    } else {
+      res.status(404).json({ message: 'Post not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 
