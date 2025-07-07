@@ -9,10 +9,13 @@ const PostEditPage = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [image, setImage] = useState('');
+  const [category, setCategory] = useState('Other');
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+
+  const categories = ['Gaming News', 'Game Reviews', 'Hardware Reviews', 'Gaming Tips', 'Esports', 'Industry News', 'Other'];
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -23,6 +26,7 @@ const PostEditPage = () => {
         setTitle(data.title);
         setContent(data.content);
         setImage(data.image);
+        setCategory(data.category || 'Other');
       } catch (err) {
         setError('Failed to fetch post');
       } finally {
@@ -44,7 +48,7 @@ const PostEditPage = () => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${userInfo.token}`,
         },
-        body: JSON.stringify({ title, content, image }),
+        body: JSON.stringify({ title, content, image, category }),
       });
       
       if (res.ok) {
@@ -139,6 +143,29 @@ const PostEditPage = () => {
                 required
                 disabled={isSubmitting}
               />
+            </div>
+            
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text text-lg font-semibold flex items-center gap-2">
+                  📂 Category
+                </span>
+              </label>
+              <select
+                className="select select-bordered select-lg w-full focus:select-primary transition-all duration-300"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                disabled={isSubmitting}
+              >
+                {categories.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat}
+                  </option>
+                ))}
+              </select>
+              <label className="label">
+                <span className="label-text-alt">Choose the most appropriate category for your post</span>
+              </label>
             </div>
             
             <div className="form-control">

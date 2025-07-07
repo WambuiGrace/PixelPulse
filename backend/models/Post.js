@@ -23,6 +23,11 @@ const postSchema = mongoose.Schema(
       type: String,
       required: true,
     },
+    category: {
+      type: String,
+      enum: ['Gaming News', 'Game Reviews', 'Hardware Reviews', 'Gaming Tips', 'Esports', 'Industry News', 'Other'],
+      default: 'Other',
+    },
     likes: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'

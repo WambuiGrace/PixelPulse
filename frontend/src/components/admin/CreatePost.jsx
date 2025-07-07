@@ -5,8 +5,11 @@ const CreatePost = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [image, setImage] = useState('');
+  const [category, setCategory] = useState('Other');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+
+  const categories = ['Gaming News', 'Game Reviews', 'Hardware Reviews', 'Gaming Tips', 'Esports', 'Industry News', 'Other'];
 
   const createPostHandler = async (e) => {
     e.preventDefault();
@@ -19,13 +22,14 @@ const CreatePost = () => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${userInfo.token}`,
         },
-        body: JSON.stringify({ title, content, image }),
+        body: JSON.stringify({ title, content, image, category }),
       });
       
       if (res.ok) {
         setTitle('');
         setContent('');
         setImage('');
+        setCategory('Other');
         toast.success('Post created successfully! 🎉', {
           duration: 4000,
           position: 'top-center',
@@ -80,6 +84,29 @@ const CreatePost = () => {
             <div className="form-control">
               <label className="label">
                 <span className="label-text text-lg font-semibold flex items-center gap-2">
+                  📂 Category
+                </span>
+              </label>
+              <select
+                className="select select-bordered select-lg w-full focus:select-primary transition-all duration-300"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                disabled={isSubmitting}
+              >
+                {categories.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat}
+                  </option>
+                ))}
+              </select>
+              <label className="label">
+                <span className="label-text-alt">Choose the most appropriate category for your post</span>
+              </label>
+            </div>
+            
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text text-lg font-semibold flex items-center gap-2">
                   ✍️ Content
                 </span>
               </label>
@@ -108,6 +135,7 @@ const CreatePost = () => {
                 className="input input-bordered input-lg w-full focus:input-primary transition-all duration-300"
                 value={image}
                 onChange={(e) => setImage(e.target.value)}
+                required
                 disabled={isSubmitting}
               />
               <label className="label">
@@ -136,7 +164,7 @@ const CreatePost = () => {
               <button 
                 type="submit"
                 className={`btn btn-primary btn-lg w-full gap-2 hover:scale-[1.02] transition-all duration-300 ${isSubmitting ? 'loading' : ''}`}
-                disabled={!title.trim() || !content.trim() || isSubmitting}
+                disabled={!title.trim() || !content.trim() || !image.trim() || isSubmitting}
               >
                 {isSubmitting ? (
                   <>

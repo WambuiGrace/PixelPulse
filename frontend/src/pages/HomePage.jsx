@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import BlogPost from '../components/BlogPost';
 
 const HomePage = () => {
@@ -19,9 +20,9 @@ const HomePage = () => {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/posts');
+        const res = await fetch('http://localhost:5000/api/posts?limit=6');
         const data = await res.json();
-        setPosts(data);
+        setPosts(data.posts || data); // Handle both new and old API response formats
       } catch (err) {
         setError('Failed to fetch posts');
       } finally {
@@ -66,15 +67,15 @@ const HomePage = () => {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <button 
-                onClick={scrollToLatestPosts}
+              <Link 
+                to="/blog"
                 className="btn btn-primary btn-lg gap-2 hover:scale-105 transition-all duration-300"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m0 0l7-7m0 7H3" />
                 </svg>
-                Explore Latest Posts
-              </button>
+                Explore Posts
+              </Link>
               <button className="btn btn-outline btn-lg gap-2 hover:scale-105 transition-all duration-300">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />

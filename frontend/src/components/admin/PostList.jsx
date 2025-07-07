@@ -21,7 +21,9 @@ const PostList = () => {
       
       if (res.ok) {
         const data = await res.json();
-        setPosts(data);
+        // Handle both new pagination format and old format
+        const postsData = data.posts || data;
+        setPosts(Array.isArray(postsData) ? postsData : []);
       } else {
         throw new Error('Failed to fetch posts');
       }
@@ -197,7 +199,7 @@ const PostList = () => {
             </div>
           </div>
 
-          {posts.length === 0 ? (
+          {!Array.isArray(posts) || posts.length === 0 ? (
             <div className="text-center py-12">
               <div className="text-6xl mb-4">📄</div>
               <h3 className="text-xl font-semibold mb-2">No posts yet</h3>
@@ -215,7 +217,7 @@ const PostList = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {posts.map((post) => (
+                  {Array.isArray(posts) && posts.map((post) => (
                     <tr key={post._id} className="hover:bg-base-200/50 transition-colors">
                       <td>
                         <div className="flex items-center gap-3">
@@ -234,8 +236,14 @@ const PostList = () => {
                           )}
                           <div>
                             <div className="font-bold text-lg">{post.title}</div>
-                            <div className="text-sm text-base-content/70">
-                              {new Date(post.createdAt).toLocaleDateString()}
+                            <div className="text-sm text-base-content/70 flex items-center gap-2">
+                              <span>{new Date(post.createdAt).toLocaleDateString()}</span>
+                              {post.category && (
+                                <>
+                                  <span>•</span>
+                                  <span className="badge badge-sm badge-outline">{post.category}</span>
+                                </>
+                              )}
                             </div>
                           </div>
                         </div>

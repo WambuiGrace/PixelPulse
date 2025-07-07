@@ -10,7 +10,7 @@ const BlogPost = ({ post, onSaveToggle }) => {
     summary,
     user,
     createdAt,
-    categories,
+    category,
     _id,
   } = post;
 
@@ -101,13 +101,11 @@ const BlogPost = ({ post, onSaveToggle }) => {
           <div className="badge badge-outline">
             {new Date(createdAt).toLocaleDateString()}
           </div>
-        </div>
-        <div className="card-actions justify-end">
-          {categories?.map((category) => (
-            <div key={category} className="badge badge-primary">
+          {category && (
+            <div className="badge badge-primary">
               {category}
             </div>
-          ))}
+          )}
         </div>
         <div className="card-actions justify-end">
           <Link to={`/blog/${_id}`} className="btn btn-primary">
