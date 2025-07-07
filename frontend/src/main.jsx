@@ -15,6 +15,7 @@ import UserProtectedRoute from './components/UserProtectedRoute.jsx';
 import AdminProtectedRoute from './components/AdminProtectedRoute.jsx';
 import UserList from './components/admin/UserList.jsx';
 import PostList from './components/admin/PostList.jsx';
+import CategoryList from './components/admin/CategoryList.jsx';
 import CreatePost from './components/admin/CreatePost.jsx';
 import UserEditPage from './pages/UserEditPage.jsx';
 import PostEditPage from './pages/PostEditPage.jsx';
@@ -69,6 +70,10 @@ const router = createBrowserRouter([
               {
                 path: 'posts',
                 element: <PostList />,
+              },
+              {
+                path: 'categories',
+                element: <CategoryList />,
               },
               {
                 path: 'create-post',

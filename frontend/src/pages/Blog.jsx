@@ -13,7 +13,26 @@ const Blog = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState({});
 
-  const categories = ['All', 'Gaming News', 'Game Reviews', 'Hardware Reviews', 'Gaming Tips', 'Esports', 'Industry News', 'Other'];
+  const [categories, setCategories] = useState(['All', 'Gaming News', 'Game Reviews', 'Hardware Reviews', 'Gaming Tips', 'Esports', 'Industry News', 'Other']);
+
+  // Fetch categories from API
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch('/api/categories');
+        if (res.ok) {
+          const data = await res.json();
+          const categoryNames = data.data.map(cat => cat.name);
+          setCategories(['All', ...categoryNames]);
+        }
+      } catch (error) {
+        console.error('Failed to fetch categories:', error);
+        // Keep default categories if API fails
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   const fetchPosts = async (page = 1, search = '', category = 'All', sort = 'createdAt', order = 'desc') => {
     try {
@@ -33,7 +52,7 @@ const Blog = () => {
         params.append('category', category);
       }
 
-      const res = await fetch(`http://localhost:5000/api/posts?${params}`);
+      const res = await fetch(`/api/posts?${params}`);
       
       if (!res.ok) {
         throw new Error('Failed to fetch posts');

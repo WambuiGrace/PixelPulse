@@ -27,7 +27,7 @@ const BlogPost = ({ post, onSaveToggle }) => {
       if (!userInfo) return;
 
       try {
-        const res = await fetch('http://localhost:5000/api/users/saved', {
+        const res = await fetch('/api/users/saved', {
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${userInfo.token}`,
@@ -54,7 +54,7 @@ const BlogPost = ({ post, onSaveToggle }) => {
 
     setIsLoading(true);
     try {
-      const res = await fetch(`http://localhost:5000/api/posts/${_id}/save`, {
+      const res = await fetch(`/api/posts/${_id}/save`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -1,95 +1,109 @@
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
 const SinglePost = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [comment, setComment] = useState('');
-  const [isSaved, setIsSaved] = useState(false);
-  const [saveLoading, setSaveLoading] = useState(false);
+  const [submittingComment, setSubmittingComment] = useState(false);
+  
   const userInfo = JSON.parse(localStorage.getItem('userInfo'));
-
-  const fetchPost = async () => {
-    try {
-      const res = await fetch(`http://localhost:5000/api/posts/${id}`);
-      const data = await res.json();
-      setPost(data);
-      
-      // Check if post is saved by current user
-      if (userInfo) {
-        const savedRes = await fetch('http://localhost:5000/api/users/saved', {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${userInfo.token}`,
-          },
-        });
-        
-        if (savedRes.ok) {
-          const savedPosts = await savedRes.json();
-          setIsSaved(savedPosts.some(savedPost => savedPost._id === id));
-        }
-      }
-    } catch (err) {
-      setError('Failed to fetch post');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   useEffect(() => {
     fetchPost();
   }, [id]);
 
-  const likeHandler = async () => {
+  const fetchPost = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/api/posts/${id}/like`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${userInfo.token}`,
-        },
-      });
-      if (res.ok) {
-        fetchPost();
+      setLoading(true);
+      const res = await fetch(`/api/posts/${id}`);
+      
+      if (!res.ok) {
+        throw new Error('Failed to fetch post');
       }
+      
+      const data = await res.json();
+      setPost(data);
     } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const saveHandler = async () => {
-    setSaveLoading(true);
-    try {
-      const res = await fetch(`http://localhost:5000/api/posts/${id}/save`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${userInfo.token}`,
-        },
-      });
-      if (res.ok) {
-        setIsSaved(!isSaved);
-        if (isSaved) {
-          toast.error('Post removed from saved posts');
-        } else {
-          toast.success('Post saved successfully!');
-        }
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error('Failed to save post. Please try again.');
+      setError(err.message);
+      toast.error('Failed to fetch post');
     } finally {
-      setSaveLoading(false);
+      setLoading(false);
     }
   };
 
-  const commentHandler = async (e) => {
-    e.preventDefault();
+  const handleLike = async () => {
+    if (!userInfo) {
+      toast.error('Please login to like posts');
+      return;
+    }
+
     try {
-      const res = await fetch(`http://localhost:5000/api/posts/${id}/comment`, {
+      const res = await fetch(`/api/posts/${id}/like`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${userInfo.token}`,
+        },
+      });
+
+      if (res.ok) {
+        const updatedLikes = await res.json();
+        setPost(prev => ({ ...prev, likes: updatedLikes }));
+        toast.success('Post liked!');
+      } else {
+        throw new Error('Failed to like post');
+      }
+    } catch (err) {
+      toast.error('Failed to like post');
+    }
+  };
+
+  const handleSave = async () => {
+    if (!userInfo) {
+      toast.error('Please login to save posts');
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/posts/${id}/save`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${userInfo.token}`,
+        },
+      });
+
+      if (res.ok) {
+        toast.success('Post saved!');
+      } else {
+        throw new Error('Failed to save post');
+      }
+    } catch (err) {
+      toast.error('Failed to save post');
+    }
+  };
+
+  const handleComment = async (e) => {
+    e.preventDefault();
+    
+    if (!userInfo) {
+      toast.error('Please login to comment');
+      return;
+    }
+
+    if (!comment.trim()) {
+      toast.error('Please enter a comment');
+      return;
+    }
+
+    try {
+      setSubmittingComment(true);
+      const res = await fetch(`/api/posts/${id}/comment`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -97,87 +111,187 @@ const SinglePost = () => {
         },
         body: JSON.stringify({ text: comment }),
       });
+
       if (res.ok) {
+        const updatedComments = await res.json();
+        setPost(prev => ({ ...prev, comments: updatedComments }));
         setComment('');
-        fetchPost();
+        toast.success('Comment added!');
+      } else {
+        throw new Error('Failed to add comment');
       }
     } catch (err) {
-      console.error(err);
+      toast.error('Failed to add comment');
+    } finally {
+      setSubmittingComment(false);
     }
   };
 
   if (loading) {
-    return <span className="loading loading-spinner loading-lg"></span>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="loading loading-spinner loading-lg"></div>
+      </div>
+    );
   }
 
-  if (error) {
-    return <div className="text-red-500">{error}</div>;
-  }
-
-  if (!post) {
-    return <div>Post not found</div>;
-  }
-
-  const { title, content, user, createdAt, image, likes, comments } = post;
-
-  return (
-    <div className="container mx-auto p-4">
-      <div className="card lg:card-side bg-base-100 shadow-xl">
-        <figure>
-          <img src={image} alt={title} />
-        </figure>
-        <div className="card-body">
-          <h1 className="card-title text-4xl">{title}</h1>
-          <div
-            className="prose"
-            dangerouslySetInnerHTML={{ __html: content }}
-          ></div>
-          <div className="card-actions justify-end">
-            <div className="badge badge-outline">{user?.name}</div>
-            <div className="badge badge-outline">
-              {new Date(createdAt).toLocaleDateString()}
-            </div>
-          </div>
-          {userInfo && (
-            <div className="card-actions justify-end">
-              <button className="btn btn-primary" onClick={likeHandler}>
-                Like ({likes.length})
-              </button>
-              <button 
-                className={`btn ${isSaved ? 'btn-success' : 'btn-secondary'} ${saveLoading ? 'loading' : ''}`}
-                onClick={saveHandler}
-                disabled={saveLoading}
-              >
-                {saveLoading ? 'Saving...' : isSaved ? 'Saved' : 'Save'}
-              </button>
-            </div>
-          )}
-          <div className="mt-4">
-            <h2 className="text-2xl font-bold">Comments</h2>
-            {comments.map((comment) => (
-              <div key={comment._id} className="chat chat-start">
-                <div className="chat-header">{comment.user.name}</div>
-                <div className="chat-bubble">{comment.text}</div>
-              </div>
-            ))}
-            {userInfo && (
-              <form onSubmit={commentHandler} className="mt-4">
-                <div className="form-control">
-                  <textarea
-                    className="textarea textarea-bordered"
-                    placeholder="Add a comment"
-                    value={comment}
-                    onChange={(e) => setComment(e.target.value)}
-                  ></textarea>
-                </div>
-                <div className="form-control mt-2">
-                  <button className="btn btn-primary">Submit</button>
-                </div>
-              </form>
-            )}
-          </div>
+  if (error || !post) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-error mb-4">Post Not Found</h2>
+          <p className="text-gray-600 mb-6">{error || 'The post you are looking for does not exist.'}</p>
+          <Link to="/blog" className="btn btn-primary">
+            Back to Blog
+          </Link>
         </div>
       </div>
+    );
+  }
+
+  return (
+    <div className="max-w-4xl mx-auto px-4 py-8">
+      {/* Navigation */}
+      <div className="mb-6">
+        <Link to="/blog" className="btn btn-ghost btn-sm">
+          ← Back to Blog
+        </Link>
+      </div>
+
+      {/* Post Header */}
+      <article className="card bg-base-100 shadow-xl">
+        {post.image && (
+          <figure>
+            <img 
+              src={post.image.startsWith('http') ? post.image : `/uploads/${post.image}`}
+              alt={post.title}
+              className="w-full h-64 md:h-96 object-cover"
+            />
+          </figure>
+        )}
+        
+        <div className="card-body">
+          {/* Category Badge */}
+          {post.category && (
+            <div className="mb-4">
+              <span className="badge badge-primary">{post.category}</span>
+            </div>
+          )}
+
+          {/* Title */}
+          <h1 className="card-title text-3xl md:text-4xl font-bold mb-4">
+            {post.title}
+          </h1>
+
+          {/* Meta Information */}
+          <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-6">
+            <span>By {post.user?.name || 'Anonymous'}</span>
+            <span>•</span>
+            <span>{new Date(post.createdAt).toLocaleDateString()}</span>
+            <span>•</span>
+            <span>{post.likes?.length || 0} likes</span>
+            <span>•</span>
+            <span>{post.comments?.length || 0} comments</span>
+          </div>
+
+          {/* Summary */}
+          {post.summary && (
+            <div className="alert alert-info mb-6">
+              <p className="text-lg italic">{post.summary}</p>
+            </div>
+          )}
+
+          {/* Content */}
+          <div className="prose max-w-none mb-8">
+            <div dangerouslySetInnerHTML={{ __html: post.content.replace(/\n/g, '<br>') }} />
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex flex-wrap gap-4 mb-8">
+            <button 
+              onClick={handleLike}
+              className={`btn ${post.likes?.includes(userInfo?._id) ? 'btn-primary' : 'btn-outline'}`}
+              disabled={!userInfo}
+            >
+              ❤️ Like ({post.likes?.length || 0})
+            </button>
+            <button 
+              onClick={handleSave}
+              className="btn btn-outline"
+              disabled={!userInfo}
+            >
+              💾 Save
+            </button>
+          </div>
+
+          {/* Comments Section */}
+          <div className="border-t pt-8">
+            <h3 className="text-2xl font-bold mb-6">Comments ({post.comments?.length || 0})</h3>
+
+            {/* Add Comment Form */}
+            {userInfo ? (
+              <form onSubmit={handleComment} className="mb-8">
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text">Add a comment</span>
+                  </label>
+                  <textarea
+                    className="textarea textarea-bordered"
+                    placeholder="Write your comment here..."
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                    rows="3"
+                    required
+                  ></textarea>
+                </div>
+                <div className="form-control mt-4">
+                  <button 
+                    type="submit" 
+                    className="btn btn-primary"
+                    disabled={submittingComment}
+                  >
+                    {submittingComment ? (
+                      <>
+                        <span className="loading loading-spinner loading-sm"></span>
+                        Posting...
+                      </>
+                    ) : (
+                      'Post Comment'
+                    )}
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <div className="alert alert-warning mb-8">
+                <p>
+                  <Link to="/auth" className="link">Login</Link> to add comments
+                </p>
+              </div>
+            )}
+
+            {/* Comments List */}
+            <div className="space-y-4">
+              {post.comments && post.comments.length > 0 ? (
+                post.comments.map((comment, index) => (
+                  <div key={index} className="card bg-base-200">
+                    <div className="card-body p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="font-semibold">{comment.user?.name || 'Anonymous'}</span>
+                        <span className="text-sm text-gray-500">
+                          {new Date(comment.createdAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                      <p>{comment.text}</p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-500 text-center py-8">No comments yet. Be the first to comment!</p>
+              )}
+            </div>
+          </div>
+        </div>
+      </article>
     </div>
   );
 };

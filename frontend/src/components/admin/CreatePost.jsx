@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import toast from 'react-hot-toast';
+import ImageUpload from '../ImageUpload';
 
 const CreatePost = () => {
   const [title, setTitle] = useState('');
@@ -129,33 +130,10 @@ const CreatePost = () => {
                   🖼️ Featured Image
                 </span>
               </label>
-              <input
-                type="url"
-                placeholder="https://example.com/image.jpg"
-                className="input input-bordered input-lg w-full focus:input-primary transition-all duration-300"
-                value={image}
-                onChange={(e) => setImage(e.target.value)}
-                required
-                disabled={isSubmitting}
+              <ImageUpload 
+                onImageUpload={setImage}
+                currentImage={image}
               />
-              <label className="label">
-                <span className="label-text-alt">Add a compelling image to make your post stand out</span>
-              </label>
-              {image && (
-                <div className="mt-4">
-                  <div className="text-sm font-medium mb-2">Preview:</div>
-                  <div className="aspect-video w-full max-w-md mx-auto rounded-lg overflow-hidden border-2 border-base-300">
-                    <img 
-                      src={image} 
-                      alt="Preview" 
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIG5vdCBmb3VuZDwvdGV4dD48L3N2Zz4=';
-                      }}
-                    />
-                  </div>
-                </div>
-              )}
             </div>
             
             <div className="divider"></div>

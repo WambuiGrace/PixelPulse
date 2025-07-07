@@ -20,7 +20,7 @@ const HomePage = () => {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/posts?limit=6');
+        const res = await fetch('/api/posts?limit=6');
         const data = await res.json();
         setPosts(data.posts || data); // Handle both new and old API response formats
       } catch (err) {
