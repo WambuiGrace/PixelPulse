@@ -16,11 +16,12 @@ const getPostById = async (req, res) => {
 };
 
 const createPost = async (req, res) => {
-  const { title, content } = req.body;
+  const { title, content, image } = req.body;
 
   const post = new Post({
     title,
     content,
+    image,
     user: req.user._id,
   });
 

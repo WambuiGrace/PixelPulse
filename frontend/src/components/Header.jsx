@@ -1,9 +1,13 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Header = () => {
-  // A placeholder for authentication state
-  const isAuthenticated = false; // This would be replaced with actual auth state
-  const isAdmin = false; // This would be replaced with actual admin state
+  const navigate = useNavigate();
+  const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+
+  const logoutHandler = () => {
+    localStorage.removeItem('userInfo');
+    navigate('/login');
+  };
 
   return (
     <div className="navbar bg-base-100">
@@ -17,18 +21,18 @@ const Header = () => {
           <li>
             <Link to="/">Home</Link>
           </li>
-          {isAuthenticated ? (
+          {userInfo ? (
             <>
               <li>
                 <Link to="/saved-posts">Saved Posts</Link>
               </li>
-              {isAdmin && (
+              {userInfo.isAdmin && (
                 <li>
-                  <Link to="/dashboard">Dashboard</Link>
+                  <Link to="/admin/dashboard">Dashboard</Link>
                 </li>
               )}
               <li>
-                <button>Logout</button>
+                <button onClick={logoutHandler}>Logout</button>
               </li>
             </>
           ) : (

@@ -130,7 +130,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"title\": \"Test Post\",\n    \"content\": \"This is a test post.\"\n}",
+							"raw": "{\n    \"title\": \"Test Post with Image\",\n    \"content\": \"This is a test post with an image.\",\n    \"image\": \"https://via.placeholder.com/150\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"

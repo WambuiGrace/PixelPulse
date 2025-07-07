@@ -33,7 +33,7 @@ const LoginPage = () => {
       }
 
       // Assuming the API returns a token, you would typically save it here
-      // e.g., localStorage.setItem('token', data.token);
+      localStorage.setItem('userInfo', JSON.stringify(data));
 
       navigate('/');
     } catch (err) {

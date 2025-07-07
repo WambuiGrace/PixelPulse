@@ -5,8 +5,8 @@ const BlogPost = ({ post }) => {
     image,
     title,
     summary,
-    author,
-    timestamp,
+    user,
+    createdAt,
     categories,
     _id,
   } = post;
@@ -20,20 +20,20 @@ const BlogPost = ({ post }) => {
         <h2 className="card-title">{title}</h2>
         <p>{summary}</p>
         <div className="card-actions justify-end">
-          <div className="badge badge-outline">{author.name}</div>
+          <div className="badge badge-outline">{user?.name}</div>
           <div className="badge badge-outline">
-            {new Date(timestamp).toLocaleDateString()}
+            {new Date(createdAt).toLocaleDateString()}
           </div>
         </div>
         <div className="card-actions justify-end">
-          {categories.map((category) => (
+          {categories?.map((category) => (
             <div key={category} className="badge badge-primary">
               {category}
             </div>
           ))}
         </div>
         <div className="card-actions justify-end">
-          <Link to={`/posts/${_id}`} className="btn btn-primary">
+          <Link to={`/blog/${_id}`} className="btn btn-primary">
             Read More
           </Link>
         </div>

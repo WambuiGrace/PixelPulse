@@ -9,7 +9,10 @@ import HomePage from './pages/HomePage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
 import RegisterPage from './pages/RegisterPage.jsx'
 import SavedPostsPage from './pages/SavedPostsPage.jsx'
-import SinglePost from './pages/SinglePost.jsx'
+import SinglePost from './pages/SinglePost.jsx';
+import AdminDashboardPage from './pages/AdminDashboardPage.jsx';
+import UserProtectedRoute from './components/UserProtectedRoute.jsx';
+import AdminProtectedRoute from './components/AdminProtectedRoute.jsx';
 
 const router = createBrowserRouter([
   {
@@ -37,16 +40,32 @@ const router = createBrowserRouter([
         element: <RegisterPage />,
       },
       {
-        path: '/dashboard',
-        element: <DashboardPage />,
+        path: '',
+        element: <UserProtectedRoute />,
+        children: [
+          {
+            path: '/dashboard',
+            element: <DashboardPage />,
+          },
+          {
+            path: '/saved-posts',
+            element: <SavedPostsPage />,
+          },
+        ],
       },
       {
-        path: '/saved-posts',
-        element: <SavedPostsPage />,
+        path: '',
+        element: <AdminProtectedRoute />,
+        children: [
+          {
+            path: '/admin/dashboard',
+            element: <AdminDashboardPage />,
+          },
+        ],
       },
     ],
   },
-])
+]);
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
