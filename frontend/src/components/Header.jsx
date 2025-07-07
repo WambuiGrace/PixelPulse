@@ -6,7 +6,7 @@ const Header = () => {
 
   const logoutHandler = () => {
     localStorage.removeItem('userInfo');
-    navigate('/login');
+    navigate('/auth');
   };
 
   return (
@@ -36,14 +36,11 @@ const Header = () => {
               </li>
             </>
           ) : (
-            <>
-              <li>
-                <Link to="/login">Login</Link>
-              </li>
-              <li>
-                <Link to="/register">Register</Link>
-              </li>
-            </>
+            <li>
+              <Link to="/auth" className="btn btn-primary btn-sm">
+                Login/Signup
+              </Link>
+            </li>
           )}
         </ul>
       </div>
